@@ -1,3 +1,4 @@
+import 'package:chat_app_tutorial_2020/helper/authenticate.dart';
 import 'package:chat_app_tutorial_2020/views/signup.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xff1F1F1F),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SignUp(),
+      home: Authenticate(),
     );
   }
 }
