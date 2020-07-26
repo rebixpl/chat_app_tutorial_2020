@@ -1,4 +1,4 @@
-import 'package:chat_app_tutorial_2020/views/signin.dart';
+import 'package:chat_app_tutorial_2020/views/signup.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,11 +12,12 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        primaryColor: Color(0xff145C9E),
         primarySwatch: Colors.blue,
-
+        scaffoldBackgroundColor: Color(0xff1F1F1F),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SignIn(),
+      home: SignUp(),
     );
   }
 }
