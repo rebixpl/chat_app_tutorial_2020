@@ -1,4 +1,5 @@
 import 'package:chat_app_tutorial_2020/services/auth.dart';
+import 'package:chat_app_tutorial_2020/services/database.dart';
 import 'package:chat_app_tutorial_2020/views/chatRoomsScreen.dart';
 import 'package:chat_app_tutorial_2020/widgets/widget.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class _SignUpState extends State<SignUp> {
   bool isLoading = false;
 
   AuthMethods authMethods = AuthMethods();
+  DatabaseMethods databaseMethods = DatabaseMethods();
 
   final formKey = GlobalKey<FormState>();
   TextEditingController userNameTextEditingController = TextEditingController();
@@ -24,6 +26,10 @@ class _SignUpState extends State<SignUp> {
 
   signMeUp() {
     if (formKey.currentState.validate()) {
+      Map<String, String> userInfoMap = {
+        "name": userNameTextEditingController.text,
+        "email": emailTextEditingController.text,
+      };
       setState(() {
         isLoading = true;
       });
@@ -31,6 +37,7 @@ class _SignUpState extends State<SignUp> {
           .signUpWithEmailAndPassword(emailTextEditingController.text,
               passwordTextEditingController.text)
           .then((val) {
+        databaseMethods.uploadUserInfo(userInfoMap);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
