@@ -1,3 +1,4 @@
+import 'package:chat_app_tutorial_2020/helper/helperFunctions.dart';
 import 'package:chat_app_tutorial_2020/services/auth.dart';
 import 'package:chat_app_tutorial_2020/services/database.dart';
 import 'package:chat_app_tutorial_2020/views/chatRoomsScreen.dart';
@@ -30,6 +31,12 @@ class _SignUpState extends State<SignUp> {
         "name": userNameTextEditingController.text,
         "email": emailTextEditingController.text,
       };
+
+      HelperFunctions.saveUserEmailSharedPreference(
+          emailTextEditingController.text);
+      HelperFunctions.saveUserNameSharedPreference(
+          userNameTextEditingController.text);
+
       setState(() {
         isLoading = true;
       });
@@ -38,6 +45,7 @@ class _SignUpState extends State<SignUp> {
               passwordTextEditingController.text)
           .then((val) {
         databaseMethods.uploadUserInfo(userInfoMap);
+        HelperFunctions.saveUserLoggedInSharedPreference(true);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

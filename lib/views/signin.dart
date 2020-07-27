@@ -1,4 +1,9 @@
+import 'package:chat_app_tutorial_2020/helper/helperFunctions.dart';
+import 'package:chat_app_tutorial_2020/services/auth.dart';
+import 'package:chat_app_tutorial_2020/services/database.dart';
+import 'package:chat_app_tutorial_2020/views/chatRoomsScreen.dart';
 import 'package:chat_app_tutorial_2020/widgets/widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
@@ -11,6 +16,49 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
+  final formKey = GlobalKey<FormState>();
+  AuthMethods authMethods = AuthMethods();
+  DatabaseMethods databaseMethods = DatabaseMethods();
+  TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController passwordTextEditingController = TextEditingController();
+
+  bool isLoading = false;
+  QuerySnapshot snapshotUserInfo;
+
+  signIn() {
+    if (formKey.currentState.validate()) {
+      HelperFunctions.saveUserEmailSharedPreference(
+          emailTextEditingController.text);
+      HelperFunctions.saveUserNameSharedPreference(
+          snapshotUserInfo.documents[0].data["name"]);
+
+      setState(() {
+        isLoading = true;
+      });
+
+      authMethods
+          .signInWithEmailAndPassword(emailTextEditingController.text,
+              passwordTextEditingController.text)
+          .then((val) {
+        if (val != null) {
+          databaseMethods
+              .getUserByUserEmail(emailTextEditingController.text)
+              .then((val) {
+            snapshotUserInfo = val;
+          });
+
+          HelperFunctions.saveUserLoggedInSharedPreference(true);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatRoom(),
+            ),
+          );
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,13 +71,36 @@ class _SignInState extends State<SignIn> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              TextField(
-                style: simpleTextStyle(),
-                decoration: textFieldInputDecoration(hintText: "Email"),
-              ),
-              TextField(
-                style: simpleTextStyle(),
-                decoration: textFieldInputDecoration(hintText: "Password"),
+              Form(
+                key: formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      validator: (val) {
+                        return RegExp(
+                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(val)
+                            ? null
+                            : "Please provide a valid email.";
+                      },
+                      controller: emailTextEditingController,
+                      style: simpleTextStyle(),
+                      decoration: textFieldInputDecoration(hintText: "Email"),
+                    ),
+                    TextFormField(
+                      obscureText: true,
+                      validator: (val) {
+                        return val.length > 6
+                            ? null
+                            : "Please provide password at least 6 characters long.";
+                      },
+                      controller: passwordTextEditingController,
+                      style: simpleTextStyle(),
+                      decoration:
+                          textFieldInputDecoration(hintText: "Password"),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: 8.0),
               Container(
@@ -44,22 +115,27 @@ class _SignInState extends State<SignIn> {
                 ),
               ),
               SizedBox(height: 8.0),
-              Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.symmetric(vertical: 20.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xff007EF4),
-                      Color(0xff2A75BC),
-                    ],
+              GestureDetector(
+                onTap: () {
+                  signIn();
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xff007EF4),
+                        Color(0xff2A75BC),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                child: Text(
-                  "Sign In",
-                  style: mediumTextStyle(),
+                  child: Text(
+                    "Sign In",
+                    style: mediumTextStyle(),
+                  ),
                 ),
               ),
               SizedBox(height: 16.0),

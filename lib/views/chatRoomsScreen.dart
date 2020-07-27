@@ -1,4 +1,6 @@
 import 'package:chat_app_tutorial_2020/helper/authenticate.dart';
+import 'package:chat_app_tutorial_2020/helper/constants.dart';
+import 'package:chat_app_tutorial_2020/helper/helperFunctions.dart';
 import 'package:chat_app_tutorial_2020/services/auth.dart';
 import 'package:chat_app_tutorial_2020/views/search.dart';
 import 'package:chat_app_tutorial_2020/views/signin.dart';
@@ -12,6 +14,16 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   AuthMethods authMethods = AuthMethods();
+
+  @override
+  void initState() {
+    getUserInfo();
+    super.initState();
+  }
+
+  getUserInfo() async {
+    Constants.myName = await HelperFunctions.getUserNameSharedPreference();
+  }
 
   @override
   Widget build(BuildContext context) {
